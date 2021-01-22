@@ -38,6 +38,11 @@ class Invoice
      */
     private $customer;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $reference;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -87,6 +92,18 @@ class Invoice
     public function setCustomer(?Customer $customer): self
     {
         $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getReference(): ?int
+    {
+        return $this->reference;
+    }
+
+    public function setReference(int $reference): self
+    {
+        $this->reference = $reference;
 
         return $this;
     }
