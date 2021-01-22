@@ -4,10 +4,11 @@ namespace App\DataFixtures;
 
 use App\Entity\Customer;
 use App\Entity\Invoice;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use DateTime;
 
-class InvoiceFixtures extends BaseFixtures
+class InvoiceFixtures extends BaseFixtures implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -21,13 +22,13 @@ class InvoiceFixtures extends BaseFixtures
             $this->createMany(
                 Invoice::class,
                 rand(0, 20),
-                function ($invoice, $i, $refInvoice) use ($ref) {
+                function ($invoice, $i) use ($ref) {
                     $status = ['SENT', 'PAID', 'CANCELLED'];
                     $invoice
                         ->setAmount($this->faker->randomFloat(2, 100, 99999))
                         ->setSentAt((new DateTime())->modify('-'.rand(0,365).'days'))
                         ->setStatus($this->faker->randomElement($status))
-                        ->setReference($refInvoice)
+                        ->setReference($i)
                         ->setCustomer($this->getReference($ref))
                     ;
                 },
@@ -40,7 +41,7 @@ class InvoiceFixtures extends BaseFixtures
     public function getDependencies()
     {
         return array(
-            Customer::class,
+            CustomerFixtures::class,
         );
     }
 }
