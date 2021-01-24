@@ -17,6 +17,7 @@ class UserFixtures extends BaseFixtures
             ->setFirstName('moi')
             ->setLastName('me')
         ;
+        $this->addReference('User_00', $user);
         $manager->persist($user);
 
         $this->createMany(
