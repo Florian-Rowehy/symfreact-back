@@ -5,9 +5,18 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\InvoiceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *     attributes={
+ *     "pagination_enabled": true,
+ *     "order": {"amount": "desc"},
+ *     },
+ *     normalizationContext={
+ *          "groups"={"invoice_listing:read"}
+ *     }
+ * )
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
  */
 class Invoice
@@ -16,32 +25,38 @@ class Invoice
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"invoice_listing:read",})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"invoice_listing:read",})
      */
     private $amount;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"invoice_listing:read",})
      */
     private $sentAt;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"invoice_listing:read",})
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="invoices")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"invoice_listing:read",})
      */
     private $customer;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"invoice_listing:read",})
      */
     private $reference;
 
