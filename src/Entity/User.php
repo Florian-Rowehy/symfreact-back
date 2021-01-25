@@ -9,18 +9,29 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *     normalizationContext={"groups"={"user_listing:read"}},
+ *     normalizationContext={"groups"={"user:read"}},
+ *     denormalizationContext={"groups"={"user:write"}}
  * )
  * @ApiFilter(
  *     SearchFilter::class,
  *     properties={"firstName", "lastName", "company"},
  * )
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(
+ *     "username",
+ *     message="This username is already taken."
+ * )
+ * @UniqueEntity(
+ *     "email",
+ *     message="This email is already taken."
+ * )
  */
 class User implements UserInterface
 {
@@ -28,13 +39,15 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_listing:read",})
+     * @Groups({"user:read",})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user_listing:read",})
+     * @Groups({"user:read", "user:write",})
+     * @Assert\NotBlank(message="The email can not be empty.")
+     * @Assert\Email()
      */
     private $email;
 
@@ -45,31 +58,53 @@ class User implements UserInterface
 
     /**
      * @var string The hashed password
+     * @Groups({"user:write",})
      * @ORM\Column(type="string")
      */
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"user_listing:read",})
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @Groups({"user:read", "user:write",})
+     * @Assert\NotBlank(message="The firstname can not be empty.")
+     * @Assert\Length(
+     *     min=3,
+     *     minMessage="The firstname should have at least 3 characters.",
+     *     max=255,
+     *     maxMessage="The firstname should have maximum 255 characters."
+     *     )
      */
     private $firstName;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"user_listing:read",})
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @Groups({"user:read", "user:write",})
+     * @Assert\NotBlank(message="The lastname can not be empty")
+     * @Assert\Length(
+     *     min=3,
+     *     minMessage="The lastname should have at least 3 characters",
+     *     max=255,
+     *     maxMessage="The lastname should have maximum 255 characters"
+     *     )
      */
     private $lastName;
 
     /**
      * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="user")
-     * @Groups({"user_listing:read",})
+     * @Groups({"user:read", "user:write",})
      */
     private $customers;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"user_listing:read",})
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Groups({"user:read", "user:write",})
+     * @Assert\NotBlank(message="The username can not be empty")
+     * @Assert\Length(
+     *     min=3,
+     *     minMessage="The username should have at least 3 characters",
+     *     max=255,
+     *     maxMessage="The username should have maximum 255 characters"
+     *     )
      */
     private $username;
 
