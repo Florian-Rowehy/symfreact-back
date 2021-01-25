@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -52,6 +53,7 @@ class Customer
     private $company;
 
     /**
+     * @ApiSubresource()
      * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="customer")
      * @Groups({"customer_listing:read",})
      */
@@ -65,6 +67,28 @@ class Customer
     public function __construct()
     {
         $this->invoices = new ArrayCollection();
+    }
+
+    /**
+     * @Groups({"customer_listing:read",})
+     * @return float
+     */
+    public function getTotalAmount(): float
+    {
+        return array_reduce($this->getInvoices()->toArray(), fn($total, $invoice) => $total + $invoice->getAmount(), 0);
+    }
+
+    /**
+     * @Groups({"customer_listing:read",})
+     * @return float
+     */
+    public function getUnpaidAmount(): float
+    {
+        return array_reduce(
+            $this->getInvoices()->toArray(),
+            fn($total, $invoice) => $invoice->getStatus() === 'SENT'?  $total + $invoice->getAmount() : $total,
+            0
+        );
     }
 
     public function getId(): ?int
