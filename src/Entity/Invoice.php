@@ -8,6 +8,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\InvoiceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -17,6 +18,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     },
  *     normalizationContext={
  *          "groups"={"invoice_listing:read"},
+ *     },
+ *     denormalizationContext={
+ *          "groups"={"invoice:write"},
  *     },
  *     subresourceOperations={
  *          "api_customers_invoices_get_subresource"={
@@ -39,33 +43,39 @@ class Invoice
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"invoice_listing:read", "customer_invoice_listing:read" })
+     * @Groups({"invoice_listing:read", "customer_invoice_listing:read", "invoice:write" })
+     * @Assert\NotBlank(message="Amount can not be empty.")
+     * @Assert\Type(type="numeric", message="Amount should be a valid numeric value.")
      */
     private $amount;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"invoice_listing:read",})
+     * @Groups({"invoice_listing:read", "invoice:write"})
      */
     private $sentAt;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"invoice_listing:read", "customer_invoice_listing:read" })
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @Groups({"invoice_listing:read", "customer_invoice_listing:read", "invoice:write" })
      * @ApiFilter(SearchFilter::class)
+     * @Assert\Choice({"SENT", "CANCELLED", "PAID"}, message="Status must be SENT, CANCELLED or PAID.")
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="invoices")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_listing:read",})
+     * @Groups({"invoice_listing:read", "invoice:write" })
+     * @Assert\NotBlank()
      */
     private $customer;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_listing:read", "customer_invoice_listing:read" })
+     * @Groups({"invoice_listing:read", "customer_invoice_listing:read", "invoice:write" })
+     * @Assert\NotBlank
+     * @Assert\Type(type="long")
      */
     private $reference;
 
