@@ -13,6 +13,7 @@ class UserFixtures extends BaseFixtures
         $user = new User();
         $user
             ->setEmail('user@gmail.com')
+            ->setUsername('mememe')
             ->setPassword($this->userPasswordEncoder->encodePassword($user, 'password'))
             ->setFirstName('moi')
             ->setLastName('me')
@@ -26,6 +27,7 @@ class UserFixtures extends BaseFixtures
             function ($user) {
                 $user
                     ->setEmail($this->faker->email)
+                    ->setUsername($this->faker->userName)
                     ->setPassword($this->userPasswordEncoder->encodePassword($user, 'password'))
                     ->setFirstName($this->faker->firstName)
                     ->setLastName($this->faker->lastName)

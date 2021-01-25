@@ -67,6 +67,12 @@ class User implements UserInterface
      */
     private $customers;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"user_listing:read",})
+     */
+    private $username;
+
     public function __construct()
     {
         $this->customers = new ArrayCollection();
@@ -96,7 +102,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string) $this->username;
     }
 
     /**
@@ -200,6 +206,13 @@ class User implements UserInterface
                 $customer->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
 
         return $this;
     }
