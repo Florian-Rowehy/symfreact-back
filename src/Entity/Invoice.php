@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\InvoiceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -14,8 +16,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "order": {"amount": "desc"},
  *     },
  *     normalizationContext={
- *          "groups"={"invoice_listing:read"}
- *     }
+ *          "groups"={"invoice_listing:read"},
+ *     },
+ *     subresourceOperations={
+ *          "api_customers_invoices_get_subresource"={
+ *                  "method"={"GET"},
+ *                  "normalization_context"={"groups"={ "customer_invoice_listing:read" }},
+ *          }
+ *     },
  * )
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
  */
@@ -25,13 +33,13 @@ class Invoice
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_listing:read",})
+     * @Groups({"invoice_listing:read", "customer_invoice_listing:read" })
      */
     private $id;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"invoice_listing:read",})
+     * @Groups({"invoice_listing:read", "customer_invoice_listing:read" })
      */
     private $amount;
 
@@ -43,7 +51,8 @@ class Invoice
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"invoice_listing:read",})
+     * @Groups({"invoice_listing:read", "customer_invoice_listing:read" })
+     * @ApiFilter(SearchFilter::class)
      */
     private $status;
 
@@ -56,7 +65,7 @@ class Invoice
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_listing:read",})
+     * @Groups({"invoice_listing:read", "customer_invoice_listing:read" })
      */
     private $reference;
 
