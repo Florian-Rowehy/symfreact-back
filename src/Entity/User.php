@@ -60,6 +60,13 @@ class User implements UserInterface
      * @var string The hashed password
      * @Groups({"user:write",})
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="The password can not be empty.")
+     * @Assert\Length(
+     *     min=5,
+     *     minMessage="The password should have at least 5 characters",
+     *     max=255,
+     *     maxMessage="The password should have maximum 255 characters"
+     *     )
      */
     private $password;
 
